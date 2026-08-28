@@ -13,56 +13,100 @@ struct AppStatus {
     model: SolarSystemModel, 
 }
 
-#[derive(Clone, Component, Copy, Debug, PartialEq)] 
+#[derive(Clone, Component, Copy, Debug, Default, PartialEq)] 
 enum SolarSystemModel { 
-    Ptolemaic(ModelConfig), 
-    Copernican(ModelConfig), 
-    Tychonic(ModelConfig), 
-    Keplerian(ModelConfig), 
-    Contemporary(ModelConfig),
+    #[default]
+    Ptolemaic, 
+    Copernican, 
+    Tychonic, 
+    Keplerian, 
+    Contemporary,
 }
 
-impl Default for SolarSystemModel {
-    fn default() -> Self { 
-        Self { 
-
+impl SolarSystemModel {
+    fn get(&self) -> ModelConfig { 
+        match self { 
+            SolarSystemModel::Ptolemaic => {
+                ModelConfig::ptolemaic() 
+            }, 
+            SolarSystemModel::Copernican => { 
+                ModelConfig::copernican() 
+            }, 
+            SolarSystemModel::Tychonic => { 
+                ModelConfig::tychonic()
+            }, 
+            SolarSystemModel::Keplerian => {
+                ModelConfig::keplerian() 
+            }, 
+            SolarSystemModel::Contemporary => {
+                ModelConfig::contemporary()
+            }, 
         }
     }
 }
 
-
-impl SolarSystemModel { 
-    fn config(&self) -> ModelConfig { 
-        ModelConfig {
-        } 
-    } 
-}
-
-#[derive(Clone, Component, Copy, Debug, Default, PartialEq)] 
-struct SpacetimeMesh { 
-    enabled: bool, 
-}
-
-#[derive(Clone, Component, Copy, Debug, Default, PartialEq)] 
+#[derive(Clone, Component, Copy, Debug, PartialEq)] 
 struct Planet { 
     name: &'static str, 
-    distance_from_sun: f32, 
-    obliquity: f32, 
-    equatorial_radius: f32, 
-    polar_radius: f32, 
-    flattening: f32, 
-    sidereal_rotation: f32, 
-    orbital_period: f32, 
-    mean_solar_distance: f32, 
+    obliquity: f64, 
+    equatorial_radius: f64, 
+    polar_radius: f64,
+    flattening: f64,
+    sidereal_rotation: f64, 
+    orbital_period: f64,
+    mean_solar_distance: f64,  
 }
 
-#[derive(Clone, Copy, Component, Debug, Default, PartialEq)]
+impl Default for Planet { 
+    fn default() -> Self { 
+        Self { 
+            name: "", 
+            obliquity: 0.0, 
+            equatorial_radius: 0.0, 
+            polar_radius: 0.0, 
+            flattening: 0.0, 
+            sidereal_rotation: 0.0, 
+            orbital_period: 0.0, 
+            mean_solar_distance: 0.0, 
+        } 
+    }
+} 
+
+impl Planet { 
+    fn new(_name: &'static str) -> Self {
+        Self { 
+            name: _name,  
+            ..default() 
+        } 
+    }
+
+    fn load_data(&mut self, data: serde_json::Value) { 
+        self.obliquity = data["axialTilt_deg"].as_f64().unwrap(); 
+        self.equatorial_radius = data["equatorialRadius_km"].as_f64().unwrap(); 
+        self.polar_radius = data["polarRadius_km"].as_f64().unwrap(); 
+        self.flattening = data["flattening"].as_f64().unwrap(); 
+        self.sidereal_rotation = data["siderealRotationPeriod_hours"].as_f64().unwrap(); 
+        self.orbital_period = data["siderealOrbitPeriod_days"].as_f64().unwrap(); 
+        self.mean_solar_distance = data["meanDistanceFromSun_millionKm"].as_f64().unwrap(); 
+    }
+}
+
+#[derive(Clone, Component, Debug, Default, PartialEq)]
 struct ModelConfig {
     planets: Vec<Planet>, 
 }
 
-#[derive(Clone, Component, Copy, Debug, Default, PartialEq)] 
-struct HistoricalEpoch { 
+impl ModelConfig { 
+    fn ptolemaic() -> Self { 
+    } 
+    fn copernican() -> Self { 
+    } 
+    fn tychonic() -> Self { 
+    } 
+    fn keplerian() -> Self { 
+    } 
+    fn contemporary() -> Self { 
+    } 
 }
 
 fn main() {
